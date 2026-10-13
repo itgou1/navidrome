@@ -188,6 +188,17 @@ const SongList = (props) => {
       createdAt: (
         <DateField source="createdAt" sortBy="recently_added" showTime />
       ),
+      starredAt: config.enableFavourites && (
+        <FunctionField
+          source="starredAt"
+          sortByOrder="DESC"
+          render={(record) =>
+            record.starred ? (
+              <DateField record={record} source="starredAt" showTime />
+            ) : null
+          }
+        />
+      ),
     }
   }, [isDesktop, classes.ratingField])
 
@@ -205,6 +216,7 @@ const SongList = (props) => {
       'comment',
       'path',
       'createdAt',
+      'starredAt',
     ],
   })
 

@@ -54,6 +54,8 @@ func (r *playlistRepository) Tracks(ctx context.Context, playlistId string, refr
 	p.setSortMappings(
 		map[string]string{
 			"id":           "playlist_tracks.id",
+			"added_at":     "playlist_tracks.added_at, playlist_tracks.id",
+			"starred_at":   "starred, starred_at, playlist_tracks.id",
 			"artist":       "order_artist_name",
 			"album_artist": "order_album_artist_name",
 			"album":        "order_album_name, album_id, disc_number, track_number, order_artist_name, " + naturalSort("f.title"),

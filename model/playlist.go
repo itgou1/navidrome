@@ -224,9 +224,10 @@ type PlaylistRepository interface {
 }
 
 type PlaylistTrack struct {
-	ID          string `json:"id"`
-	MediaFileID string `json:"mediaFileId"`
-	PlaylistID  string `json:"playlistId"`
+	ID          string     `json:"id"`
+	MediaFileID string     `json:"mediaFileId"`
+	PlaylistID  string     `json:"playlistId"`
+	AddedAt     *time.Time `structs:"added_at" json:"addedAt"`
 	MediaFile
 }
 

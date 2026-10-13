@@ -40,7 +40,9 @@
         "tags": "附加标签",
         "mappedTags": "映射标签",
         "rawTags": "原始标签",
-        "missing": "丢失"
+        "missing": "丢失",
+        "starredAt": "收藏时间",
+        "addedAt": "加入歌单时间"
       },
       "actions": {
         "addToQueue": "添加到播放队列",
@@ -611,7 +613,17 @@
     "shareSuccess": "URL 已复制: %{url}",
     "shareFailure": "URL 复制失败: %{url}",
     "downloadDialogTitle": "下载 %{resource} '%{name}' (%{size})",
-    "downloadOriginalFormat": "下载原始格式"
+    "downloadOriginalFormat": "下载原始格式",
+    "timeSort": {
+      "label": "排序",
+      "other": "当前列排序",
+      "playlistOrder": "歌单原始顺序",
+      "titleOrder": "歌曲标题：升序",
+      "favoriteNewest": "收藏时间：从新到旧",
+      "favoriteOldest": "收藏时间：从旧到新",
+      "addedNewest": "加入歌单：从新到旧",
+      "addedOldest": "加入歌单：从旧到新"
+    }
   },
   "menu": {
     "library": "媒体库",

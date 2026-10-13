@@ -151,6 +151,7 @@ type shareTrack struct {
 	Title     string    `json:"title,omitempty"`
 	Artist    string    `json:"artist,omitempty"`
 	Album     string    `json:"album,omitempty"`
+	Lyrics    string    `json:"lyrics,omitempty"`
 	UpdatedAt time.Time `json:"updatedAt"`
 	Duration  float32   `json:"duration,omitempty"`
 }
@@ -171,6 +172,7 @@ func addShareData(r *http.Request, data map[string]any, shareInfo *model.Share) 
 			Title:     mf.Title,
 			Artist:    mf.Artist,
 			Album:     mf.Album,
+			Lyrics:    mf.Lyrics,
 			Duration:  mf.Duration,
 			UpdatedAt: mf.UpdatedAt,
 		}

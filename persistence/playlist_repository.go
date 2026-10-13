@@ -269,20 +269,39 @@ func (r *playlistRepository) updateTracks(ctx context.Context, id string, tracks
 }
 
 func (r *playlistRepository) updatePlaylist(ctx context.Context, playlistId string, mediaFileIds []string) error {
+	// A full replacement is also used for imports and reordering. Match each occurrence
+	// separately so duplicate tracks retain their own addition time, including unknown times.
+	var previous []struct {
+		MediaFileID string
+		AddedAt     *time.Time
+	}
+	err := r.queryAll(ctx, Select("media_file_id", "added_at").From("playlist_tracks").
+		Where(Eq{"playlist_id": playlistId}).OrderBy("id"), &previous)
+	if err != nil {
+		return err
+	}
+	addedTimes := make(map[string][]*time.Time)
+	for _, track := range previous {
+		addedTimes[track.MediaFileID] = append(addedTimes[track.MediaFileID], track.AddedAt)
+	}
 	// Remove old tracks
 	del := Delete("playlist_tracks").Where(Eq{"playlist_id": playlistId})
-	_, err := r.executeSQL(ctx, del)
+	_, err = r.executeSQL(ctx, del)
 	if err != nil {
 		return err
 	}
 
-	_, err = r.addTracks(ctx, playlistId, 1, mediaFileIds)
+	_, err = r.addTracksWithTimes(ctx, playlistId, 1, mediaFileIds, addedTimes)
 	return err
 }
 
 // addTracks is the only path that writes playlist_tracks rows (smart playlists aside), so it owns
 // the library and existence check: every caller, including a full replace through Put, goes through it.
 func (r *playlistRepository) addTracks(ctx context.Context, playlistId string, startingPos int, mediaFileIds []string) (int, error) {
+	return r.addTracksWithTimes(ctx, playlistId, startingPos, mediaFileIds, nil)
+}
+
+func (r *playlistRepository) addTracksWithTimes(ctx context.Context, playlistId string, startingPos int, mediaFileIds []string, addedTimes map[string][]*time.Time) (int, error) {
 	mediaFileIds, err := r.keepAccessible(ctx, mediaFileIds)
 	if err != nil {
 		return 0, err
@@ -290,10 +309,16 @@ func (r *playlistRepository) addTracks(ctx context.Context, playlistId string, s
 	// Break the track list in chunks to avoid hitting SQLITE_MAX_VARIABLE_NUMBER limit
 	// Add new tracks, chunk by chunk
 	pos := startingPos
+	now := time.Now()
 	for chunk := range slices.Chunk(mediaFileIds, 200) {
-		ins := Insert("playlist_tracks").Columns("playlist_id", "media_file_id", "id")
+		ins := Insert("playlist_tracks").Columns("playlist_id", "media_file_id", "id", "added_at")
 		for _, t := range chunk {
-			ins = ins.Values(playlistId, t, pos)
+			addedAt := &now
+			if times := addedTimes[t]; len(times) > 0 {
+				addedAt = times[0]
+				addedTimes[t] = times[1:]
+			}
+			ins = ins.Values(playlistId, t, pos, addedAt)
 			pos++
 		}
 		if _, err := r.executeSQL(ctx, ins); err != nil {

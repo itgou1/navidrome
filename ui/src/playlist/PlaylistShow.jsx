@@ -56,6 +56,7 @@ const PlaylistShowLayout = (props) => {
         >
           <PlaylistSongs
             {...props}
+            smart={!!record.rules}
             readOnly={!canChangeTracks(record)}
             title={<Title subTitle={record.name} />}
             actions={

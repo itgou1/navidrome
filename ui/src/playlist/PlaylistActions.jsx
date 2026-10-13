@@ -7,6 +7,7 @@ import {
   useTranslate,
   useDataProvider,
   useNotify,
+  useListContext,
 } from 'react-admin'
 import { useMediaQuery, makeStyles } from '@material-ui/core'
 import PlayArrowIcon from '@material-ui/icons/PlayArrow'
@@ -30,12 +31,14 @@ import PropTypes from 'prop-types'
 import { formatBytes } from '../utils'
 import config from '../config'
 import { ToggleFieldsMenu } from '../common'
+import TimeSortSelect from '../common/TimeSortSelect'
 
 const useStyles = makeStyles({
   toolbar: { display: 'flex', justifyContent: 'space-between', width: '100%' },
 })
 
 const PlaylistActions = ({ className, ids, data, record, ...rest }) => {
+  const { currentSort } = useListContext()
   const dispatch = useDispatch()
   const translate = useTranslate()
   const classes = useStyles()
@@ -53,7 +56,7 @@ const PlaylistActions = ({ className, ids, data, record, ...rest }) => {
       dataProvider
         .getList('playlistTrack', {
           pagination: { page: 1, perPage: 0 },
-          sort: { field: 'id', order: 'ASC' },
+          sort: currentSort || { field: 'id', order: 'ASC' },
           filter: { playlist_id: record.id },
         })
         .then((res) => {
@@ -61,13 +64,18 @@ const PlaylistActions = ({ className, ids, data, record, ...rest }) => {
             (acc, curr) => ({ ...acc, [curr.id]: curr }),
             {},
           )
-          dispatch(action(data))
+          dispatch(
+            action(
+              data,
+              res.data.map((track) => track.id),
+            ),
+          )
         })
         .catch(() => {
           notify('ra.page.error', 'warning')
         })
     },
-    [dataProvider, dispatch, record, data, ids, notify],
+    [dataProvider, dispatch, record, data, ids, notify, currentSort],
   )
 
   const handlePlay = React.useCallback(() => {
@@ -162,7 +170,10 @@ const PlaylistActions = ({ className, ids, data, record, ...rest }) => {
             <QueueMusicIcon />
           </Button>
         </div>
-        <div>{isNotSmall && <ToggleFieldsMenu resource="playlistTrack" />}</div>
+        <div>
+          <TimeSortSelect playlist smart={!!record.rules} />
+          {isNotSmall && <ToggleFieldsMenu resource="playlistTrack" />}
+        </div>
       </div>
     </TopToolbar>
   )

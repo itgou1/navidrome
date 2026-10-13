@@ -263,6 +263,7 @@ var _ = Describe("addShareData", func() {
 					{
 						ID:        "track1",
 						Title:     "Track 1",
+						Lyrics:    `[{"synced":false,"line":[{"value":"Shared lyrics"}]}]`,
 						Artist:    "Artist 1",
 						Album:     "Album 1",
 						Duration:  100,
@@ -303,6 +304,7 @@ var _ = Describe("addShareData", func() {
 				Expect(track.Title).To(Equal(shareInfo.Tracks[i].Title))
 				Expect(track.Artist).To(Equal(shareInfo.Tracks[i].Artist))
 				Expect(track.Album).To(Equal(shareInfo.Tracks[i].Album))
+				Expect(track.Lyrics).To(Equal(shareInfo.Tracks[i].Lyrics))
 				Expect(track.Duration).To(Equal(shareInfo.Tracks[i].Duration))
 				Expect(track.UpdatedAt).To(Equal(shareInfo.Tracks[i].UpdatedAt))
 			}

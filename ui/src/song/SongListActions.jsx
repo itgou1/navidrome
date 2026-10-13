@@ -2,6 +2,7 @@ import React, { cloneElement } from 'react'
 import { sanitizeListRestProps, TopToolbar } from 'react-admin'
 import { useMediaQuery } from '@material-ui/core'
 import { ShuffleAllButton, ToggleFieldsMenu } from '../common'
+import TimeSortSelect from '../common/TimeSortSelect'
 
 export const SongListActions = ({
   currentSort,
@@ -25,6 +26,7 @@ export const SongListActions = ({
   return (
     <TopToolbar className={className} {...sanitizeListRestProps(rest)}>
       <ShuffleAllButton filters={filterValues} />
+      <TimeSortSelect />
       {filters &&
         cloneElement(filters, {
           resource,

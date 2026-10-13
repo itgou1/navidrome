@@ -90,7 +90,7 @@ const ReorderableList = ({ readOnly, children, ...rest }) => {
   return <ReactDragListView {...rest}>{children}</ReactDragListView>
 }
 
-const PlaylistSongs = ({ playlistId, readOnly, actions, ...props }) => {
+const PlaylistSongs = ({ playlistId, readOnly, smart, actions, ...props }) => {
   const listContext = useListContext()
   const { data, ids, selectedIds, onUnselectItems, refetch, setPage } =
     listContext
@@ -171,6 +171,20 @@ const PlaylistSongs = ({ playlistId, readOnly, actions, ...props }) => {
       channels: isDesktop && <NumberField source="channels" />,
       bpm: isDesktop && <NumberField source="bpm" />,
       genre: <TextField source="genre" />,
+      addedAt: !smart && (
+        <DateField source="addedAt" sortByOrder="DESC" showTime />
+      ),
+      starredAt: config.enableFavourites && (
+        <FunctionField
+          source="starredAt"
+          sortByOrder="DESC"
+          render={(record) =>
+            record.starred ? (
+              <DateField record={record} source="starredAt" showTime />
+            ) : null
+          }
+        />
+      ),
       rating: config.enableStarRating && (
         <RatingField
           source="rating"
@@ -180,7 +194,7 @@ const PlaylistSongs = ({ playlistId, readOnly, actions, ...props }) => {
         />
       ),
     }
-  }, [isDesktop, classes.draggable, classes.ratingField])
+  }, [isDesktop, classes.draggable, classes.ratingField, smart])
 
   const columns = useSelectedFields({
     resource: 'playlistTrack',
@@ -194,6 +208,8 @@ const PlaylistSongs = ({ playlistId, readOnly, actions, ...props }) => {
       'albumArtist',
       'genre',
       'rating',
+      'starredAt',
+      'addedAt',
     ],
   })
 
@@ -219,7 +235,11 @@ const PlaylistSongs = ({ playlistId, readOnly, actions, ...props }) => {
             />
           </BulkActionsToolbar>
           <ReorderableList
-            readOnly={readOnly}
+            readOnly={
+              readOnly ||
+              listContext.currentSort?.field !== 'id' ||
+              listContext.currentSort?.order !== 'ASC'
+            }
             onDragEnd={handleDragEnd}
             nodeSelector={'tr'}
           >

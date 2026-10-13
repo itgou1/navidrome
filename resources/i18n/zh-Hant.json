@@ -40,7 +40,9 @@
         "composer": "作曲者",
         "disc": "光碟 %{discNumber}",
         "albumGain": "專輯增益",
-        "trackGain": "曲目增益"
+        "trackGain": "曲目增益",
+        "starredAt": "收藏時間",
+        "addedAt": "加入歌單時間"
       },
       "actions": {
         "addToQueue": "加入至播放佇列",
@@ -609,7 +611,17 @@
     "coverRemoved": "已移除封面圖",
     "coverUploadError": "上傳封面圖時發生錯誤",
     "coverRemoveError": "移除封面圖時發生錯誤",
-    "metadataRefreshStarted": "正在背景重新整理中繼資料"
+    "metadataRefreshStarted": "正在背景重新整理中繼資料",
+    "timeSort": {
+      "label": "排序",
+      "other": "目前欄位排序",
+      "playlistOrder": "歌單原始順序",
+      "titleOrder": "歌曲標題：升冪",
+      "favoriteNewest": "收藏時間：由新到舊",
+      "favoriteOldest": "收藏時間：由舊到新",
+      "addedNewest": "加入歌單：由新到舊",
+      "addedOldest": "加入歌單：由舊到新"
+    }
   },
   "menu": {
     "library": "媒體庫",
