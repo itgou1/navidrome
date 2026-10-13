@@ -148,7 +148,8 @@ func (r *playlistTrackRepository) GetCursor(ctx context.Context, options ...mode
 func (r *playlistTrackRepository) GetMediaFileIDs(ctx context.Context, options ...model.QueryOptions) ([]string, error) {
 	query := r.newSelect(ctx, options...).Columns("media_file_id").
 		Join("media_file f on f.id = media_file_id").
-		Where(Eq{"playlist_id": r.playlistId})
+		Where(Eq{"playlist_id": r.playlistId}).
+		OrderBy("playlist_tracks.id")
 	query = r.applyLibraryFilter(ctx, query, "f")
 	var ids []string
 	if err := r.queryAllSlice(ctx, query, &ids); err != nil {
