@@ -134,12 +134,9 @@ const ShareLyrics = ({ container, lyrics, currentTime }) => {
 
   useEffect(() => {
     if (!cover) return
-    const player = cover.closest('.react-jinke-music-player-mobile')
     cover.classList.toggle('share-lyrics-visible', visible)
-    player?.classList.toggle('share-lyrics-mode', visible)
     return () => {
       cover.classList.remove('share-lyrics-visible')
-      player?.classList.remove('share-lyrics-mode')
     }
   }, [cover, visible])
 

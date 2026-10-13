@@ -60,6 +60,7 @@ jobs:
           cat > release-notes.md <<'EOF'
           Custom Navidrome build for Linux amd64 (Ubuntu 22.04 or newer).
 
+          - Keep progress, playback controls, and cover dimensions stable when switching between artwork and lyrics.
           - Improve mobile share lyrics layout, scrolling, and playback follow controls.
           - Display music library names in share-page titles.
           - Return per-entry addedAt timestamps in full Subsonic playlist details.

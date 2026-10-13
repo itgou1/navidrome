@@ -20,32 +20,8 @@ const useStyle = makeStyles({
     '& .share-lyrics-visible img': { visibility: 'hidden' },
     '& .react-jinke-music-player-mobile-cover.share-lyrics-visible': {
       borderRadius: 0,
-      border: '0 !important',
+      borderColor: 'transparent !important',
       boxShadow: 'none !important',
-      width: '100% !important',
-      height: 'auto !important',
-      flex: '1 1 0',
-      minHeight: 0,
-      margin: '8px auto 12px',
-      '& img': { display: 'none' },
-    },
-    '& .react-jinke-music-player-mobile.share-lyrics-mode': {
-      boxSizing: 'border-box',
-      padding: '16px 20px max(16px, env(safe-area-inset-bottom))',
-      '& > .group': { flex: '0 0 auto', maxWidth: '100%' },
-      '& .react-jinke-music-player-mobile-header-title': {
-        fontSize: 18,
-        whiteSpace: 'normal',
-        display: '-webkit-box',
-        WebkitLineClamp: 2,
-        WebkitBoxOrient: 'vertical',
-        lineHeight: 1.5,
-      },
-      '& .react-jinke-music-player-mobile-singer': { padding: '8px 0 12px' },
-      '& .react-jinke-music-player-mobile-switch': { display: 'none' },
-      '& .react-jinke-music-player-mobile-progress': { minHeight: 36 },
-      '& .react-jinke-music-player-mobile-toggle': { padding: '16px 0' },
-      '& .react-jinke-music-player-mobile-operation': { padding: '12px 0' },
     },
     '& .group .next-audio': {
       pointerEvents: (props) => props.single && 'none',
@@ -60,7 +36,7 @@ const useStyle = makeStyles({
         width: 768,
         margin: 'auto',
       },
-      '& .react-jinke-music-player-mobile-cover:not(.share-lyrics-visible)': {
+      '& .react-jinke-music-player-mobile-cover': {
         width: 'auto !important',
       },
     },
