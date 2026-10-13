@@ -1,0 +1,71 @@
+name: Custom Linux Release
+
+on:
+  push:
+    tags:
+      - 'custom-*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: custom-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env:
+      CGO_ENABLED: '1'
+      GOMAXPROCS: '2'
+      GOMEMLIMIT: 3GiB
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - name: Build and test web interface
+        working-directory: ui
+        run: |
+          npm ci
+          npx vitest run src/common/TimeSortSelect.test.jsx src/share/ShareLyrics.test.jsx src/share/SharePlayer.integration.test.jsx src/playlist/PlaylistList.test.jsx
+          npm run build
+      - name: Test backend
+        run: go test -p 2 -tags netgo,sqlite_fts5 ./persistence ./model ./server ./server/nativeapi ./db/migrations
+      - name: Build Linux amd64
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          mkdir -p dist
+          go build -p 2 -tags netgo,sqlite_fts5 \
+            -ldflags "-s -w -X github.com/navidrome/navidrome/consts.gitSha=${GITHUB_SHA:0:8} -X github.com/navidrome/navidrome/consts.gitTag=${RELEASE_TAG}" \
+            -o dist/navidrome .
+          dist/navidrome --version
+          ldd dist/navidrome
+          tar -czf "dist/navidrome_${RELEASE_TAG}_linux_amd64.tar.gz" -C dist navidrome
+          cd dist
+          sha256sum *.tar.gz > SHA256SUMS
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          cat > release-notes.md <<'EOF'
+          Custom Navidrome build for Linux amd64 (Ubuntu 22.04 or newer).
+
+          - Click share-page artwork to switch between cover and lyrics.
+          - Sort songs by favourite time, newest or oldest first.
+          - Sort ordinary playlist tracks by addition time; preserve timestamps when reordering.
+          - Historical playlist entries retain an unknown addition time.
+
+          Back up the database and existing executable before upgrading. This release adds a database migration.
+          EOF
+          gh release create "$RELEASE_TAG" dist/*.tar.gz dist/SHA256SUMS \
+            --verify-tag --title "Navidrome ${RELEASE_TAG}" --notes-file release-notes.md
