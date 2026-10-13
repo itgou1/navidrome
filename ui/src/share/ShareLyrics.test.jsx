@@ -78,6 +78,51 @@ describe('ShareLyrics', () => {
     expect(screen.getByText('Plain lyrics')).not.toHaveAttribute('aria-current')
   })
 
+  it('lets readers scroll without snapping back or closing the lyrics', () => {
+    const { rerender } = render(
+      <ShareLyrics container={container} lyrics={lyrics} currentTime={0} />,
+    )
+    fireEvent.click(screen.getByRole('button', { name: '显示歌词' }))
+    const region = screen.getByRole('region', { name: '歌词' })
+    region.scrollTo = vi.fn()
+    fireEvent.wheel(region)
+    fireEvent.click(screen.getByText('First line'))
+    rerender(
+      <ShareLyrics container={container} lyrics={lyrics} currentTime={3} />,
+    )
+    expect(region.scrollTo).not.toHaveBeenCalled()
+    expect(screen.getByText('Second line')).toHaveAttribute(
+      'aria-current',
+      'true',
+    )
+    fireEvent.click(screen.getByRole('button', { name: '回到当前歌词' }))
+    expect(region.scrollTo).toHaveBeenCalled()
+    expect(
+      screen.queryByRole('button', { name: '回到当前歌词' }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('pauses following for touch and keyboard browsing and resets for a new track', () => {
+    const { rerender } = render(
+      <ShareLyrics container={container} lyrics={lyrics} currentTime={0} />,
+    )
+    fireEvent.click(screen.getByRole('button', { name: '显示歌词' }))
+    const region = screen.getByRole('region', { name: '歌词' })
+    fireEvent.touchMove(region)
+    expect(
+      screen.getByRole('button', { name: '回到当前歌词' }),
+    ).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '回到当前歌词' }))
+    fireEvent.keyDown(region, { key: 'ArrowDown' })
+    expect(
+      screen.getByRole('button', { name: '回到当前歌词' }),
+    ).toBeInTheDocument()
+    rerender(<ShareLyrics container={container} currentTime={0} />)
+    expect(
+      screen.queryByRole('button', { name: '回到当前歌词' }),
+    ).not.toBeInTheDocument()
+  })
+
   it.each(['invalid', '{}', 'null', '[null]', '[]'])(
     'handles invalid or empty metadata: %s',
     (value) => {

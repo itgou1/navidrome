@@ -191,6 +191,16 @@ func addShareData(r *http.Request, data map[string]any, shareInfo *model.Share) 
 		data["ShareDescription"] = shareInfo.Contents
 	}
 	data["ShareURL"] = shareInfo.URL
+	var libraryNames []string
+	seenLibraries := make(map[string]bool)
+	for _, track := range shareInfo.Tracks {
+		name := strings.TrimSpace(track.LibraryName)
+		if name != "" && !seenLibraries[name] {
+			libraryNames = append(libraryNames, name)
+			seenLibraries[name] = true
+		}
+	}
+	data["ShareLibraryName"] = strings.Join(libraryNames, " / ")
 	data["ShareImageURL"] = shareInfo.ImageURL
 	data["ShareInfo"] = string(shareInfoJson)
 }

@@ -166,6 +166,9 @@ type Child struct {
 	IsVideo               bool       `xml:"isVideo,attr,omitempty"                  json:"isVideo,omitempty"`
 	BookmarkPosition      int64      `xml:"bookmarkPosition,attr,omitempty"         json:"bookmarkPosition,omitempty"`
 	*OpenSubsonicChild    `xml:",omitempty" json:",omitempty"`
+
+	// AddedAt is the time this occurrence was added to its playlist.
+	AddedAt *time.Time `xml:"addedAt,attr,omitempty" json:"addedAt,omitempty"`
 }
 
 type OpenSubsonicChild struct {
@@ -333,7 +336,9 @@ type Playlists struct {
 
 type PlaylistWithSongs struct {
 	Playlist
-	Entry []Child `xml:"entry"                                    json:"entry,omitempty"`
+	// SupportsAddedAt describes per-entry time support, even when all times are unknown.
+	SupportsAddedAt bool    `xml:"supportsAddedAt,attr" json:"supportsAddedAt"`
+	Entry           []Child `xml:"entry"                                    json:"entry,omitempty"`
 }
 
 type SearchResult2 struct {

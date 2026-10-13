@@ -43,6 +43,31 @@ var _ = Describe("serveIndex", func() {
 		Expect(config).To(BeAssignableToTypeOf(map[string]any{}))
 	})
 
+	It("renders library names safely in the share page title", func() {
+		r := httptest.NewRequest("GET", "/share/test", nil)
+		share := &model.Share{ID: "test", Tracks: model.MediaFiles{
+			{LibraryName: "我的音乐 & <精选>"},
+			{LibraryName: "我的音乐 & <精选>"},
+			{LibraryName: "  古典音乐  "},
+			{},
+		}}
+		w := httptest.NewRecorder()
+		serveIndex(ds, os.DirFS("ui"), share)(w, r)
+		Expect(w.Code).To(Equal(200))
+		Expect(w.Body.String()).To(ContainSubstring("<title>我的音乐 &amp; &lt;精选&gt; / 古典音乐</title>"))
+		Expect(w.Body.String()).To(ContainSubstring(`property="og:site_name" content="我的音乐 &amp; &lt;精选&gt; / 古典音乐"`))
+	})
+
+	It("keeps the default title when no library name is available", func() {
+		for _, share := range []*model.Share{nil, {ID: "test", Tracks: model.MediaFiles{{}}}} {
+			r := httptest.NewRequest("GET", "/", nil)
+			w := httptest.NewRecorder()
+			serveIndex(ds, os.DirFS("ui"), share)(w, r)
+			Expect(w.Code).To(Equal(200))
+			Expect(w.Body.String()).To(ContainSubstring("<title>Navidrome</title>"))
+		}
+	})
+
 	It("sets firstTime = true when User table is empty", func() {
 		mockUser.empty = true
 		r := httptest.NewRequest("GET", "/index.html", nil)

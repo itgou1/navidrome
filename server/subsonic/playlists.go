@@ -52,9 +52,16 @@ func (api *Router) getPlaylist(ctx context.Context, id string) (*responses.Subso
 
 	response := newResponse()
 	response.Playlist = &responses.PlaylistWithSongs{
-		Playlist: api.buildPlaylist(ctx, *pls),
+		Playlist:        api.buildPlaylist(ctx, *pls),
+		SupportsAddedAt: !pls.IsSmartPlaylist(),
 	}
-	response.Playlist.Entry = slice.MapWithArg(pls.MediaFiles(), ctx, childFromMediaFile)
+	response.Playlist.Entry = slice.Map(pls.Tracks, func(track model.PlaylistTrack) responses.Child {
+		entry := childFromMediaFile(ctx, track.MediaFile)
+		if response.Playlist.SupportsAddedAt {
+			entry.AddedAt = track.AddedAt
+		}
+		return entry
+	})
 	return response, nil
 }
 

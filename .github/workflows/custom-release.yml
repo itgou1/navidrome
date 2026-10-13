@@ -38,7 +38,7 @@ jobs:
           npx vitest run src/common/TimeSortSelect.test.jsx src/share/ShareLyrics.test.jsx src/share/SharePlayer.integration.test.jsx src/playlist/PlaylistList.test.jsx
           npm run build
       - name: Test backend
-        run: go test -p 2 -tags netgo,sqlite_fts5 ./persistence ./model ./server ./server/nativeapi ./db/migrations
+        run: go test -p 2 -tags netgo,sqlite_fts5 ./persistence ./model ./server ./server/nativeapi ./server/subsonic ./server/subsonic/responses ./db/migrations
       - name: Build Linux amd64
         env:
           RELEASE_TAG: ${{ github.ref_name }}
@@ -60,12 +60,13 @@ jobs:
           cat > release-notes.md <<'EOF'
           Custom Navidrome build for Linux amd64 (Ubuntu 22.04 or newer).
 
-          - Click share-page artwork to switch between cover and lyrics.
-          - Sort songs by favourite time, newest or oldest first.
-          - Sort ordinary playlist tracks by addition time; preserve timestamps when reordering.
-          - Historical playlist entries retain an unknown addition time.
+          - Improve mobile share lyrics layout, scrolling, and playback follow controls.
+          - Display music library names in share-page titles.
+          - Return per-entry addedAt timestamps in full Subsonic playlist details.
+          - Declare supportsAddedAt for ordinary playlists, including empty and historical playlists; smart playlists explicitly return false.
+          - Keep creation responses consistent and preserve unknown historical timestamps.
 
-          Back up the database and existing executable before upgrading. This release adds a database migration.
+          Back up the database and existing executable before upgrading. No new database migration since custom-2026.10.13.3.
           EOF
           gh release create "$RELEASE_TAG" dist/*.tar.gz dist/SHA256SUMS \
             --verify-tag --title "Navidrome ${RELEASE_TAG}" --notes-file release-notes.md

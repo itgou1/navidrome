@@ -20,13 +20,13 @@
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
     <link rel="manifest" href="./manifest.webmanifest" />
-    <meta property="og:site_name" content="Navidrome">
+    <meta property="og:site_name" content="{{if .ShareLibraryName}}{{.ShareLibraryName}}{{else}}Navidrome{{end}}">
     <meta property="og:url" content="{{ .ShareURL }}">
     <meta property="og:title" content="{{ .ShareDescription }}">
     <meta property="og:image" content="{{ .ShareImageURL }}">
     <meta property="og:image:width" content="300">
     <meta property="og:image:height" content="300">
-    <title>Navidrome</title>
+    <title>{{if .ShareLibraryName}}{{.ShareLibraryName}}{{else}}Navidrome{{end}}</title>
     <script>
       // Shim for libraries that check for Node.js process object
       window.process = { env: {} };
